@@ -29,22 +29,9 @@ public class NIOClient extends Thread {
         channel.configureBlocking(false);
 
         channel.register(selector, SelectionKey.OP_CONNECT);
-//        channel.register(selector, SelectionKey.OP_READ);
         channel.connect(address);
 
-//        while (!channel.finishConnect()) {
-//            System.out.println("check finish connection");
-//        }
     }
-
-//    public void send(byte[] data) throws IOException {
-//        SocketChannel channel = SocketChannel.open();
-//        channel.configureBlocking(false);
-//        channel.connect(new InetSocketAddress(ip, port));
-//        channel.write(ByteBuffer.wrap(data));
-//        channel.register(selector, SelectionKey.OP_CONNECT);
-//
-//    }
 
     public void run() {
         System.out.println("客户端已经启动!");
@@ -73,7 +60,6 @@ public class NIOClient extends Thread {
                         if (key.isWritable()) {
                             doWrite(key);
                         }
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -104,6 +90,7 @@ public class NIOClient extends Thread {
         System.out.println("write data to server...");
         SocketChannel channel = (SocketChannel) key.channel();
 
+        //传递类名,方法名,方法参数
         Invocation invocation = new Invocation();
         invocation.setClazz(HelloServiceImpl.class);
         invocation.setMethodName("hello");

@@ -77,7 +77,6 @@ public class NIOServer extends Thread {
         SocketChannel channel = server.accept();
         channel.configureBlocking(false);
 
-//                            channel.write(ByteBuffer.wrap(new String("向客户端发送了一条信息").getBytes()));
         channel.register(selector, SelectionKey.OP_READ);
 
     }
@@ -142,6 +141,4 @@ public class NIOServer extends Thread {
             server.stopServer();
         }
     }
-
-
 }

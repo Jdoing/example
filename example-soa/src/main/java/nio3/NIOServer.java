@@ -3,7 +3,9 @@ package nio3;
 import common.*;
 import util.NIOUtil;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
@@ -19,22 +21,16 @@ public class NIOServer extends Thread {
 
     private ServerSocketChannel ssc;
 
-    private int port;
-
-    private ConcurrentHashMap<Class<?>, ClientInvoker> invokerMap = new ConcurrentHashMap<Class<?>, ClientInvoker>();
+    private ConcurrentHashMap<Class<?>, ServerInvoker> invokerMap = new ConcurrentHashMap<>();
 
     public NIOServer() {
-    }
-
-    public NIOServer(int port) throws IOException {
-        this.port = port;
     }
 
     public boolean containInvoker(Class<?> clazz) {
         return invokerMap.containsKey(clazz);
     }
 
-    public void addInvoker(Class<?> clazz, ClientInvoker invoker) {
+    public void addInvoker(Class<?> clazz, ServerInvoker invoker) {
         invokerMap.put(clazz, invoker);
     }
 
@@ -58,12 +54,6 @@ public class NIOServer extends Thread {
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }
-                }
-
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
 
@@ -90,10 +80,7 @@ public class NIOServer extends Thread {
         }
     }
 
-
     private void doAccept(SelectionKey key) throws IOException {
-        System.out.println("accept connection...");
-
         ServerSocketChannel server = (ServerSocketChannel) key.channel();
         SocketChannel channel = server.accept();
         channel.configureBlocking(false);
@@ -103,7 +90,6 @@ public class NIOServer extends Thread {
     }
 
     private void doRead(SelectionKey key) throws IOException {
-
         SocketChannel channel = (SocketChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(Constant.BUFFER_SIZE);
 
@@ -121,15 +107,16 @@ public class NIOServer extends Thread {
                     Invocation invocation = request.getInvocation();
 
                     Class<?> clazz = invocation.getClazz();
+
                     if (invokerMap.containsKey(clazz)) {
-                        ClientInvoker invoker = invokerMap.get(clazz);
+                        ServerInvoker invoker = invokerMap.get(clazz);
                         Object result = invoker.invoke(invocation);
 
                         Response response = new Response();
                         response.setResult(result);
                         response.setMsgId(request.getMsgId());
 
-                        channel.register(selector, SelectionKey.OP_WRITE, result);
+                        channel.register(selector, SelectionKey.OP_WRITE, response);
                     }
                 } finally {
                     objectInputStream.close();
@@ -183,6 +170,4 @@ public class NIOServer extends Thread {
             server.stopServer();
         }
     }
-
-
 }

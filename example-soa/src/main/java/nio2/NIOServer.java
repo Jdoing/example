@@ -16,15 +16,6 @@ import java.util.Set;
  */
 public class NIOServer extends Thread {
     private Selector selector;
-    private int port;
-
-
-    public NIOServer() {
-    }
-
-    public NIOServer(int port) throws IOException {
-        this.port = port;
-    }
 
     public void run() {
         System.out.println("服务端线程已经启动!");
@@ -94,26 +85,20 @@ public class NIOServer extends Thread {
         ByteBuffer buffer = ByteBuffer.allocate(Constant.BUFFER_SIZE);
 
         try {
-//            while (channel.read(buffer) > 0) {
-//                buffer.flip();
-//                System.out.println(getString(buffer));
-//                buffer.clear();
-//            }
             buffer.clear();
             if (channel.read(buffer) > 0) {
                 buffer.flip();
-
-//                ByteBuffer readBuffer = buffer.asReadOnlyBuffer();
+                //序列化
                 ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(buffer.array()));
                 try {
                     Invocation invocation = (Invocation) objectInputStream.readObject();
-
+                    //RPC调用在这里实现
                     Class<?> clazz = invocation.getClazz();
                     Object object = clazz.newInstance();
                     Method method = clazz.getMethod(invocation.getMethodName(), invocation.getParameterTypes());
                     Object result = method.invoke(object, invocation.getArguments());
 
-                    channel.register(selector, SelectionKey.OP_WRITE, result);
+                    channel.register(selector, SelectionKey.OP_WRITE, result);//发送响应
                 } finally {
                     objectInputStream.close();
                 }
@@ -129,7 +114,6 @@ public class NIOServer extends Thread {
     private void doWrite(SelectionKey key) throws IOException {
         System.out.println(Thread.currentThread().getName() + " write data to client...");
         SocketChannel channel = (SocketChannel) key.channel();
-//        ByteBuffer buffer = ByteBuffer.wrap(new String("Hi, client").getBytes("utf-8"));
 
         Object object = key.attachment();
         if (object != null) {

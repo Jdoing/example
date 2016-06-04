@@ -1,8 +1,8 @@
 package nio3;
 
 import common.Constant;
-import common.ClientInvoker;
 import service.HelloService;
+import service.HelloServiceImpl;
 
 import java.io.IOException;
 
@@ -25,23 +25,22 @@ public class RpcProvider {
 
     }
 
-    public void export(Class<?> clazz) throws InstantiationException, IllegalAccessException {
+    public void export(Class<?> service, Class clazz) throws InstantiationException, IllegalAccessException {
         if (clazz == null) {
             throw new IllegalArgumentException("clazz不能为空!");
         }
 
-        if (server.containInvoker(clazz)) {
+        if (server.containInvoker(service)) {
             return;
         } else {
-
-            ClientInvoker invoker = new ClientInvoker(clazz);
-            server.addInvoker(clazz, invoker);
+            ServerInvoker invoker = new ServerInvoker(clazz);
+            server.addInvoker(service, invoker);
         }
     }
 
     public static void main(String[] args) throws IOException, IllegalAccessException, InstantiationException {
         RpcProvider rpcProvider = new RpcProvider();
 
-        rpcProvider.export(HelloService.class);
+        rpcProvider.export(HelloService.class, HelloServiceImpl.class);
     }
 }

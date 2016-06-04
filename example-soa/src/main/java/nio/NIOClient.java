@@ -26,22 +26,8 @@ public class NIOClient extends Thread {
         channel.configureBlocking(false);
 
         channel.register(selector, SelectionKey.OP_CONNECT);
-//        channel.register(selector, SelectionKey.OP_READ);
         channel.connect(address);
-
-//        while (!channel.finishConnect()) {
-//            System.out.println("check finish connection");
-//        }
     }
-
-//    public void send(byte[] data) throws IOException {
-//        SocketChannel channel = SocketChannel.open();
-//        channel.configureBlocking(false);
-//        channel.connect(new InetSocketAddress(ip, port));
-//        channel.write(ByteBuffer.wrap(data));
-//        channel.register(selector, SelectionKey.OP_CONNECT);
-//
-//    }
 
     public void run() {
         System.out.println("客户端已经启动!");
@@ -59,14 +45,7 @@ public class NIOClient extends Thread {
                         if (channel.isConnectionPending()) {
                             channel.finishConnect();
                         }
-//                            // 设置成非阻塞
-//                            channel.configureBlocking(false);
-//                            //在这里可以给服务端发送信息哦
-//                            channel.write(ByteBuffer.wrap(new String("向服务端发送了一条信息").getBytes("utf-8")));
-//
                         channel.register(selector, SelectionKey.OP_WRITE);
-//                        channel.write(ByteBuffer.wrap(new String("Hi, server").getBytes("utf-8")));
-
                     }
 
                     if (key.isReadable()) {
@@ -114,8 +93,6 @@ public class NIOClient extends Thread {
         if (selector != null && selector.isOpen()) {
             selector.close();
         }
-
-
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {

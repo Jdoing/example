@@ -13,8 +13,11 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,44 +27,99 @@ import java.util.concurrent.locks.ReentrantLock;
 public class NIOClient extends Thread {
     private Selector selector;
 
-    private Map<Long, Response> resMap = new ConcurrentHashMap<Long, Response>();
+    private Map<Long, Response> resMap = new ConcurrentHashMap<>();
 
-    private Map<Long, Lock> resultHolderMap = new ConcurrentHashMap<Long, Lock>();
+    private Map<Long, ResultHolder> resultHolderMap = new ConcurrentHashMap<>();
+
+    //任务队列
+    private Queue<Task> tasks = new ConcurrentLinkedQueue<>();
+
+    private static class Task {
+        public static final int REGISTER = 1;
+        public static final int CHANGEOPS = 2;
+
+        public SocketChannel channel;
+        public int type;
+        public int ops;
+        public Object data;
+
+        public Task(SocketChannel channel, int type, int ops, Object data) {
+            this.channel = channel;
+            this.type = type;
+            this.ops = ops;
+            this.data = data;
+        }
+    }
+
+    private static class ResultHolder {
+        Lock lock = new ReentrantLock();
+        Condition done = lock.newCondition();
+    }
+
+    public NIOClient() throws IOException {
+        selector = Selector.open();
+    }
 
     public void initClient() throws IOException {
-        System.out.println(Thread.currentThread().getName() + " init client");
         selector = Selector.open();
     }
 
     public void addResultHolder(long msgId) {
-        Lock lock = new ReentrantLock();
-
-        resultHolderMap.put(msgId, lock);
+        resultHolderMap.put(msgId, new ResultHolder());
     }
 
-    public SelectionKey newSelectionKey() throws IOException {
+    public SocketChannel newSocketChanel() throws IOException {
         InetSocketAddress address = new InetSocketAddress(Constant.PORT);
 
-        selector.wakeup();
         SocketChannel channel = SocketChannel.open();
         channel.configureBlocking(false);
 
-        SelectionKey key = channel.register(selector, SelectionKey.OP_CONNECT);
         channel.connect(address);
 
-        return key;
+        return channel;
+    }
+
+    public void send(SocketChannel channel, Object object) throws InterruptedException {
+        if (channel.isConnected()) {
+            //add write task
+            tasks.add(new Task(channel, Task.CHANGEOPS, SelectionKey.OP_WRITE, object));
+        } else {
+            //add connect task
+            tasks.add(new Task(channel, Task.REGISTER, SelectionKey.OP_CONNECT, object));
+        }
+
+        //唤醒selector,这里很重要.负责selector一直阻塞,不会收到注册事件.
+        selector.wakeup();
     }
 
     public void run() {
         System.out.println(Thread.currentThread().getName() + " 客户端已经启动!");
         try {
             while (true) {
+                if (tasks.peek() != null) {
+                    Task task = tasks.remove();
+                    switch (task.type) {
+                        case Task.CHANGEOPS:
+                            SelectionKey key = task.channel.keyFor(selector);
+                            key.interestOps(task.ops);
+                            key.attach(task.data);
+                            break;
+                        case Task.REGISTER:
+                            SelectionKey key2 = task.channel.register(selector, task.ops);
+                            key2.attach(task.data);
+                            break;
+                        default:
+                            throw new IllegalArgumentException("task.type error");
+                    }
+                }
+
                 selector.select();
+
                 Set<SelectionKey> keys = selector.selectedKeys();
                 Iterator<SelectionKey> iterator = keys.iterator();
                 while (iterator.hasNext()) {
                     SelectionKey key = iterator.next();
-                    iterator.remove();
+                    iterator.remove();//移除,否则会死循环
 
                     try {
                         if (key.isConnectable()) {
@@ -72,9 +130,8 @@ public class NIOClient extends Thread {
                             if (channel.isConnectionPending()) {
                                 channel.finishConnect();
                             }
+                            key.interestOps(SelectionKey.OP_WRITE);
 
-//                            channel.configureBlocking(false);
-                            channel.register(selector, SelectionKey.OP_WRITE);
                         }
 
                         if (key.isReadable()) {
@@ -97,16 +154,8 @@ public class NIOClient extends Thread {
         }
     }
 
-    public Response getResponse(String msgId) {
-        if (resMap.containsKey(msgId)) {
-            return resMap.remove(msgId);
-        } else {
-            return null;
-        }
-    }
-
     private void doRead(SelectionKey key) throws IOException, ClassNotFoundException {
-        System.out.println("read data from server...");
+        System.out.print("read data from server====>");
         SocketChannel channel = (SocketChannel) key.channel();
         ByteBuffer buffer = ByteBuffer.allocate(Constant.BUFFER_SIZE);
 
@@ -120,56 +169,50 @@ public class NIOClient extends Thread {
                 throw new ClassCastException("object不能转换为result");
             }
 
-            resMap.put(response.getMsgId(), response);
+            //找到对应挂起的线程,唤醒它
+            ResultHolder resultHolder = resultHolderMap.get(response.getMsgId());
+            resultHolder.lock.lock();
+            try {
+                resMap.put(response.getMsgId(), response);
+                resultHolder.done.signal();
+            } finally {
+                resultHolder.lock.unlock();
+            }
 
-            Lock lock = resultHolderMap.get(response.getMsgId());
-            lock.notifyAll();
-
-            System.out.println(response.getResult());
-            channel.register(selector, SelectionKey.OP_WRITE);
-
+            //不要随便设置OP_WRITE,否则会耗尽CPU,只有在需要的时候才设置
+//            channel.register(selector, SelectionKey.OP_WRITE);
+        } else {
+            System.out.println("no data to read!");
         }
     }
 
-    //TODO 返回后需要删除response
     public Object getResult(long msgId) throws InterruptedException {
         Response response = resMap.get(msgId);
         if (response == null) {
-            Lock lock = resultHolderMap.get(msgId);
+            ResultHolder resultHolder = resultHolderMap.get(msgId);
 
-            System.out.println(Thread.currentThread().getName() + " get result");
-
-            synchronized (lock){
-                while ((response = resMap.get(msgId)) == null) {
-                    lock.wait();
+            resultHolder.lock.lock();
+            try {
+                while (resMap.get(msgId) == null) {
+                    resultHolder.done.await();
                 }
 
-                resMap.put(msgId, response);
+            } finally {
+                resultHolder.lock.unlock();
             }
-
-//            lock.lock();
-//            try {
-//                while ((response = resMap.get(msgId)) == null) {
-//                    lock.wait();
-//                }
-//
-//                resMap.put(msgId, response);
-//
-//            } finally {
-//                lock.unlock();
-//            }
         }
 
-        return response;
+        return resMap.remove(msgId);
     }
 
     private void doWrite(SelectionKey key) throws Exception {
         Object data = key.attachment();
         if (data == null) {
+            System.out.println("no data to write");
             return;
         }
 
-        System.out.println("write data to server...");
+        System.out.print("send data to server===>");
         SocketChannel channel = (SocketChannel) key.channel();
         ByteBuffer buffer = NIOUtil.getByteBuffer(data);
         while (buffer.hasRemaining()) {

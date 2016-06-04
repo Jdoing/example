@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by juemingzi on 16/5/24.
  */
-public class ClientInvoker<T> implements Invoker{
+public class ClientInvoker<T> implements Invoker {
 
     private ExchangeClient exchangeClient;
 
