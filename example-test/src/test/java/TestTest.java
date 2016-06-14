@@ -1,48 +1,19 @@
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Created by juemingzi on 16/5/18.
+ * Created by juemingzi on 16/6/7.
  */
-
-interface A{
-
-}
-
-
 public class TestTest {
-    private Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+    private static final long YEAR_MILLIS = 365 * 24 * 3600 * 1000L;
 
     @Test
-    public void test() {
-        TestTest testTest = new TestTest();
-        testTest.put(String.class, "");
+    public void test(){
 
+        System.out.println(this.getClass().getCanonicalName());
+        System.out.println(this.getClass().getSimpleName());
+        System.out.println(this.getClass().getName());
+
+        System.out.println(this.getClass().getPackage());
     }
 
-    public <T> void put(Class<T> type, T instance){
-        map.put(type, instance);
-    }
-
-
-    public <T> T get(Class<T> type){
-        type.cast(map.get(type));
-        return (T)map.get(type);
-    }
-
-    class AA implements A{
-
-    }
-
-    @Test
-    public void testA(){
-        AA aa = new AA();
-
-        if(aa instanceof A){
-            System.out.println("SS");
-        }
-
-    }
 }

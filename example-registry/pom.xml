@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>example-zookeeper</artifactId>
+    <artifactId>example-registry</artifactId>
     <packaging>jar</packaging>
 
-    <name>example-zookeeper</name>
+    <name>example-registry</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -34,7 +34,7 @@
     </dependencies>
 
     <build>
-        <finalName>example-zookeeper</finalName>
+        <finalName>example-registry</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

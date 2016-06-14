@@ -11,12 +11,13 @@
         <module>example-common</module>
         <module>example-web</module>
         <module>example-core</module>
-        <module>example-zookeeper</module>
+        <module>example-registry</module>
         <module>example-service</module>
         <module>example-consumer</module>
         <module>example-redis</module>
         <module>example-soa</module>
         <module>example-transport</module>
+        <module>example-test</module>
     </modules>
     <packaging>pom</packaging>
     <name>example</name>
@@ -24,11 +25,11 @@
     <properties>
         <spring.version>4.2.4.RELEASE</spring.version>
         <junit.version>4.11</junit.version>
-        <zookeeper.version>3.3.6</zookeeper.version>
+        <zookeeper.version>3.4.6</zookeeper.version>
         <curator.version>2.8.0</curator.version>
-        <dubbo.version>2.8.4</dubbo.version>
+        <dubbo.version>2.5.4</dubbo.version>
         <netty.version>4.0.35.Final</netty.version>
-
+        <zkclient.version>0.1</zkclient.version>
     </properties>
 
     <dependencyManagement>
@@ -100,17 +101,38 @@
                 <artifactId>curator-test</artifactId>
                 <version>${curator.version}</version>
             </dependency>
+            <!--dubbo-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>dubbo</artifactId>
                 <version>${dubbo.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
+
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty</artifactId>
                 <version>${netty.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.sgroschupf</groupId>
+                <artifactId>zkclient</artifactId>
+                <version>${zkclient.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
