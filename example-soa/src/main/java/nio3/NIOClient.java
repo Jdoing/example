@@ -1,7 +1,7 @@
 package nio3;
 
-import common.Constant;
-import common.Response;
+import example.common.Constant;
+import example.soa.Response;
 import util.NIOUtil;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package nio2;
 
-import common.Invocation;
-import common.Constant;
+import example.soa.Invocation;
+import example.common.Constant;
 
 import java.io.*;
 import java.lang.reflect.Method;

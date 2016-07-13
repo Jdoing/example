@@ -17,5 +17,4 @@ public abstract class AbstractServer implements Server{
         return channelHandler;
     }
 
-
 }

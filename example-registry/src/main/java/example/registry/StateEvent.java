@@ -7,6 +7,10 @@ public enum StateEvent {
 
     CONNECTED,
 
-    DISCONNECTED
+    DISCONNECTED,
+
+    RECONNECTED
+
+
 
 }

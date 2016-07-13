@@ -1,7 +1,7 @@
 package rpc2;
 
-import common.Invoker;
-import common.ServerInvoker;
+import example.soa.Invoker;
+import example.soa.ServerInvoker;
 import service.HelloService;
 import service.HelloServiceImpl;
 import transport.NettyServer;

@@ -1,6 +1,6 @@
 package transport;
 
-import common.Request;
+import example.soa.Request;
 import example.transport.netty.DecoderHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

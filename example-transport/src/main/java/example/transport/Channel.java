@@ -15,5 +15,4 @@ public interface Channel extends Endpoint{
 
     void send(Object message);
 
-
 }

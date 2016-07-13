@@ -1,8 +1,8 @@
 package nio2;
 
-import common.Invocation;
+import example.soa.Invocation;
 import service.HelloServiceImpl;
-import common.Constant;
+import example.common.Constant;
 import util.NIOUtil;
 
 import java.io.IOException;

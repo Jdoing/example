@@ -1,4 +1,4 @@
-package common;
+package example.soa;
 
 import transport.ExchangeClient;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by juemingzi on 16/5/24.
  */
-public class ClientInvoker<T> implements Invoker {
+public class ClientInvoker<T> implements Invoker<T> {
 
     private ExchangeClient exchangeClient;
 
@@ -31,6 +31,11 @@ public class ClientInvoker<T> implements Invoker {
 
     public void setClazz(Class<T> clazz) {
         this.clazz = clazz;
+    }
+
+    @Override
+    public Class<T> getInterface() {
+        return clazz;
     }
 
     public Result invoke(Invocation invocation) throws ExecutionException, InterruptedException {

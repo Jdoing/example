@@ -1,6 +1,7 @@
 package rpc3;
 
-import common.*;
+import example.common.Constant;
+import example.soa.*;
 import example.transport.AbstractChannelHandler;
 import example.transport.Channel;
 import example.transport.ChannelHandler;
@@ -61,6 +62,7 @@ public class RpcConsumer {
                 return response.getResult();
             }
         });
+
     }
 
     public static void main(String[] args) throws Exception {

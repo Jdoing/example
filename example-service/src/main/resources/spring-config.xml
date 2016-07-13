@@ -17,7 +17,7 @@
     <dubbo:protocol name="dubbo" port="20880"/>
 
     <!-- 声明需要暴露的服务接口 -->
-    <dubbo:service interface="ydoing.service.ExampleService" ref="exampleService"/>
+    <dubbo:service interface="ydoing.service.ExampleService" ref="exampleService" timeout="10000000"/>
 
     <!-- 和本地bean一样实现服务 -->
     <bean id="exampleService" class="ydoing.service.ExampleServiceImp"/>

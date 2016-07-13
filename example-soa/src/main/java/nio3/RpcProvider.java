@@ -1,6 +1,6 @@
 package nio3;
 
-import common.Constant;
+import example.common.Constant;
 import service.HelloService;
 import service.HelloServiceImpl;
 

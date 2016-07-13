@@ -1,8 +1,8 @@
 package nio3;
 
-import common.Invocation;
-import common.Request;
-import common.Response;
+import example.soa.Invocation;
+import example.soa.Request;
+import example.soa.Response;
 import service.HelloService;
 
 import java.io.IOException;

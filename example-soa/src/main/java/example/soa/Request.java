@@ -1,4 +1,4 @@
-package common;
+package example.soa;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;

@@ -1,4 +1,4 @@
-package common;
+package example.common;
 
 /**
  * Created by juemingzi on 16/5/23.

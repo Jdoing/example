@@ -1,4 +1,4 @@
-package common;
+package example.soa;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,6 +1,6 @@
 package demo;
 
-import common.Constant;
+import example.common.Constant;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

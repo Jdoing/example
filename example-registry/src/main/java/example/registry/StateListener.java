@@ -5,6 +5,6 @@ package example.registry;
  */
 public interface StateListener {
 
-    void stateChanged(StateEvent stateEvent);
+    void onChanged(StateEvent stateEvent) throws Exception;
 
 }

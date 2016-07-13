@@ -1,9 +1,9 @@
 package rpc2;
 
-import common.ClientInvoker;
-import common.Invocation;
-import common.Response;
-import common.ResponseFuture;
+import example.soa.ClientInvoker;
+import example.soa.Invocation;
+import example.soa.Response;
+import example.soa.ResponseFuture;
 import service.HelloService;
 import transport.ExchangeClient;
 

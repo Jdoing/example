@@ -1,8 +1,8 @@
 package transport;
 
-import common.Invocation;
-import common.Request;
-import common.ResponseFuture;
+import example.soa.Invocation;
+import example.soa.Request;
+import example.soa.ResponseFuture;
 import io.netty.channel.Channel;
 
 import java.util.concurrent.ExecutionException;

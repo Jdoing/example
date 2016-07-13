@@ -1,6 +1,9 @@
 package nio3;
 
-import common.*;
+import example.common.Constant;
+import example.soa.Invocation;
+import example.soa.Request;
+import example.soa.Response;
 import util.NIOUtil;
 
 import java.io.ByteArrayInputStream;

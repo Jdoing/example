@@ -1,6 +1,6 @@
 package nio3;
 
-import common.Invocation;
+import example.soa.Invocation;
 
 import java.lang.reflect.Method;
 

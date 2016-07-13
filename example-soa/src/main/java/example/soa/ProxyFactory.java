@@ -1,4 +1,4 @@
-package common;
+package example.soa;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
