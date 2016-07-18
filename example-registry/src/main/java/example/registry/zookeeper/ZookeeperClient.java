@@ -1,10 +1,7 @@
 package example.registry.zookeeper;
 
 import example.common.URL;
-import example.registry.ChildListener;
-import example.registry.NotifyListener;
-import example.registry.StateEvent;
-import example.registry.StateListener;
+import example.registry.*;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -25,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by juemingzi on 16/6/12.
  */
-public class ZookeeperClient {
+public class ZookeeperClient implements ZkClient {
 
     private CuratorFramework client;
 
@@ -108,10 +105,6 @@ public class ZookeeperClient {
         });
 
         return client.getChildren().forPath(path);
-    }
-
-    public CuratorFramework getClient() {
-        return client;
     }
 
     public static void main(String[] args) throws Exception {
