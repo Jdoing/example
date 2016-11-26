@@ -1,15 +1,11 @@
 import org.junit.Before;
 import org.junit.Test;
 import org.redisson.Config;
-import org.redisson.Redisson;
-import org.redisson.RedissonClient;
 import org.redisson.core.RAtomicLong;
 
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by juemingzi on 16/3/23.
@@ -42,7 +38,7 @@ public class BaseTest {
         public void run() {
             try {
                 begin.await();
-                for (int i = 0; i < loopCount; i++){
+                for (int i = 0; i < loopCount; i++) {
                     rAtomicLong.getAndAdd(1);
                 }
 
@@ -58,24 +54,17 @@ public class BaseTest {
 
     private final int loopCount = 10;
     private final int threadNum = 10;
+
     @Test
     public void testBase() throws InterruptedException, BrokenBarrierException {
-        RedissonClient client = Redisson.create(config);
-        RAtomicLong longObject = client.getAtomicLong("myLong");
-        longObject.set(0);
+        Object object = new Object();
+        Object ref = object;
 
-        CyclicBarrier begin = new CyclicBarrier(threadNum);
-        CountDownLatch end = new CountDownLatch(threadNum);
+        object = null;
 
-        for(int i = 0; i < threadNum; i++){
-
-            new Thread(new Worker(begin, end, longObject)).start();
-        }
-
-        end.await();
-
-        assertEquals(threadNum * loopCount, longObject.get());
-
+        System.out.println(object);
+        System.out.println(ref);
     }
+
 
 }

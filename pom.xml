@@ -4,12 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ydoing</groupId>
-    <artifactId>example</artifactId>
+    <groupId>com.ydoing</groupId>
+    <artifactId>example-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>example-web</module>
-        <module>example-core</module>
         <module>example-registry</module>
         <module>example-service</module>
         <module>example-consumer</module>
@@ -19,9 +17,10 @@
         <module>example-test</module>
         <module>example-common</module>
         <module>example-netty</module>
+        <module>example-spring</module>
     </modules>
     <packaging>pom</packaging>
-    <name>example</name>
+    <name>example-parent</name>
 
     <properties>
         <spring.version>4.2.4.RELEASE</spring.version>
